@@ -96,14 +96,20 @@ app = Rack::Builder.new {
   use Rails::Rack::LogTailer unless options[:detach]
   use Rails::Rack::Debugger if options[:debugger]
   map map_path do
-    use Rails::Rack::Static 
+    use Rails::Rack::Static
     run inner_app
   end
 }.to_app
 
 puts "=> Call with -d to detach"
 
-trap(:INT) { exit }
+trap(:INT) {
+  if server.respond_to?(:shutdown)
+    server.shutdown
+  else
+    exit
+  end
+}
 
 puts "=> Ctrl-C to shutdown server"
 

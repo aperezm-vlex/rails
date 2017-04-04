@@ -42,7 +42,12 @@ ARGV.clone.options do |opts|
   opts.parse!
 end
 
-server = Rack::Handler.get(ARGV.first) rescue nil
+begin
+  server = Rack::Handler.get(ARGV.first)
+rescue MissingSourceFile
+    server = nil
+end
+
 unless server
   begin
     server = Rack::Handler::Mongrel
